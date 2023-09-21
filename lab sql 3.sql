@@ -85,8 +85,41 @@ select rating from film group BY rating having avg(length)>120;
 #4.
 select last_name from actor group by last_name having count(distinct last_name)=1;
 
+# LAB 3. Joints
+SELECT rating, count(*) as number_of_films from film group by rating order by number_of_films desc;
 
+select s.store_id, ci.city, co.country from store as s
+ join address as a on s.address_id = a.address_id
+ join city as ci on a.city_id = ci.city_id
+ join country as co on ci.country_id = co.country_id; # needed triple joint to solve
+ 
+select s.store_id, sum(p.amount) as total_revenue from store as s
+ join payment as p on s.manager_staff_id = p.staff_id
+ GROUP BY s.store_id order by s.store_id;
+ 
+select c.name as category_name,		#4+5
+		avg(f.length) as avg_length from category as c
+ join film_category as fc on c.category_id = fc.category_id
+ join film as f on fc.film_id = f.film_id
+ group by c.name order by avg_length desc; 
 
+select title, rental_rate from film order by rental_rate desc limit 10; #6 
+
+select f.title, s.store_id, count(*) as avialable_copies from film as f  #7
+join inventory as i on f.film_id = i.film_id
+join store as s on i.store_id = s.store_id
+left join rental as r on i.inventory_id = r.inventory_id
+where f.title = "%Academy%Dinosaur%" and s.store_id = 1 and (r.return_date is not null) # or r.return_date < now())
+group by f.title, s.store_id;
+
+select distinct f.title as film_title,
+    case
+        when ifnull(sum(i.inventory_id), 0) > 0 then 'available'
+        else 'not available'
+    end as availability_status
+from film as f
+left join inventory as i on f.film_id = i.film_id
+group by f.title;
 
 
 
